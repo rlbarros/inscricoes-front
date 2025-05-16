@@ -13,6 +13,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { BookOpen, Check, User } from "lucide-react";
+import { data } from "autoprefixer";
 
 const RegistrationForm = () => {
   const { toast } = useToast();
@@ -41,8 +42,27 @@ const RegistrationForm = () => {
 
   const [passwordVisible, setPasswordVisible] = useState(false);
 
+  const [isSubmitting, setSubmitting] = useState(false);
+
   const togglePasswordVisibility = () => {
     setPasswordVisible((prev) => !prev);
+  };
+
+  const convertDate = (data) => {
+    if (!data) {
+      return "";
+    }
+
+    var array = data.split("-");
+    if (array.length < 3) {
+      return "";
+    }
+
+    var year = array[0];
+    var month = array[1];
+    var day = array[2];
+
+    return `${day}/${month}/${year}`;
   };
 
   const sheetUrl =
@@ -125,7 +145,7 @@ const RegistrationForm = () => {
 
       var url = sheetUrl + "?action=Create";
       url += `&fullName=${formData.fullName}`;
-      url += `&birthDate=${formData.birthDate}`;
+      url += `&birthDate=${convertDate(formData.birthDate)}`;
       url += `&superintendence=${formData.superintendence}`;
       url += `&position=${formData.position}`;
       url += `&gender=${formData.gender}`;
@@ -140,6 +160,8 @@ const RegistrationForm = () => {
       url += `&username=${formData.username}`;
       url += `&password=${formData.password}`;
 
+      setSubmitting(true);
+
       fetch(url, {
         method: "GET",
       })
@@ -149,8 +171,7 @@ const RegistrationForm = () => {
           }
           return res.json();
         })
-        .then((json) => {
-          console.log(json);
+        .then(() => {
           toast({
             title: "Pré-Inscrição realizada com sucesso!",
             description:
@@ -167,6 +188,7 @@ const RegistrationForm = () => {
           });
         })
         .finally(() => {
+          setSubmitting(false);
           // Reset form
           setFormData({
             fullName: "",
@@ -630,7 +652,7 @@ const RegistrationForm = () => {
                   </li>
                   <li>
                     <span className="font-medium">Data de Nascimento:</span>{" "}
-                    {formData.birthDate}
+                    {convertDate(formData.birthDate)}
                   </li>
                   <li>
                     <span className="font-medium">Sexo:</span> {formData.gender}
@@ -664,9 +686,34 @@ const RegistrationForm = () => {
             ) : (
               <Button
                 type="submit"
-                className="ml-auto bg-gradient-to-r from-primary to-primary/80"
+                className="ml-auto bg-gradient-to-r from-primary to-primary/80 sb-btn"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  padding: "10px 20px",
+                  backgroundColor: isSubmitting ? "#ccc" : "#007bff",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: isSubmitting ? "not-allowed" : "pointer",
+                }}
               >
-                <Check className="mr-2 h-4 w-4" /> Finalizar Inscrição
+                {isSubmitting ? (
+                  <span
+                    style={{
+                      width: "16px",
+                      height: "16px",
+                      border: "2px solid #fff",
+                      borderTop: "2px solid transparent",
+                      borderRadius: "50%",
+                      animation: "spin 1s linear infinite",
+                    }}
+                  />
+                ) : (
+                  "Finalizar Pré Inscrição"
+                )}
               </Button>
             )}
           </div>

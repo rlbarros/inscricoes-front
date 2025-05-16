@@ -40,8 +40,8 @@ const App = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.7 }}
         >
-          © {new Date().getFullYear()} Igreja evangélica Apostólioa. Todos os
-          direitos reservados.
+          © {new Date().getFullYear()} Igreja evangélica Apostólioa | v 1.0.0 |
+          Todos os direitos reservados.
         </motion.footer>
       </motion.div>
       <Toaster />
