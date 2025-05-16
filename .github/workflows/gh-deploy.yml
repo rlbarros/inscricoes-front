@@ -20,7 +20,6 @@ jobs:
       - name: Install dependencies
         uses: borales/actions-yarn@v4
         with:
-          dir: inscricoes-front
           cmd: install # will run `yarn install` command
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # if needed
@@ -28,7 +27,6 @@ jobs:
       - name: Build
         uses: borales/actions-yarn@v4
         with:
-          dir: inscricoes-front
           cmd: build
 
       - name: Pushes to another repository
@@ -36,7 +34,7 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source-directory: "./inscricoes-front/dist"
+          source-directory: "./dist"
           destination-github-username: "rlbarros"
           destination-repository-name: "inscricoes"
           user-email: rlbarros@outlook.com
