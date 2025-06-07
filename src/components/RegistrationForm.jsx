@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -13,13 +13,14 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { BookOpen, Check, User } from "lucide-react";
-import { data } from "autoprefixer";
 
 const RegistrationForm = () => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     fullName: "",
     birthDate: "",
+    phone: "",
+    email: "",
     superintendence: "",
     position: "",
     gender: "",
@@ -66,10 +67,14 @@ const RegistrationForm = () => {
   };
 
   const sheetUrl =
-    "https://script.google.com/macros/s/AKfycbx6JyT6sHqkghFVwYHxIFsrErY1VlT5FtEBCcsSHXfkYJgfbs5ujyzNxBl5l54xmtc1HQ/exec";
+    "https://script.google.com/macros/s/AKfycbxt3HXU6eS1yZFxDJUl2cIWN8p3UkEZgb17ZU_-RmfXsiJp5lOud8fEvR4LrKJnRuOMXw/exec";
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+
+    if (name == "phone") {
+      value = handlePhone(value);
+    }
 
     if (name.includes(".")) {
       const [parent, child] = name.split(".");
@@ -94,6 +99,8 @@ const RegistrationForm = () => {
     if (step === 0) {
       if (!formData.fullName.trim())
         newErrors.fullName = "Nome completo é obrigatório";
+      if (!formData.phone) newErrors.phone = "O telefone é obrigatório";
+      if (!formData.email) newErrors.email = "O email  é obrigatório";
       if (!formData.birthDate)
         newErrors.birthDate = "Data de nascimento é obrigatória";
       if (!formData.position)
@@ -146,6 +153,8 @@ const RegistrationForm = () => {
       var url = sheetUrl + "?action=Create";
       url += `&fullName=${formData.fullName}`;
       url += `&birthDate=${convertDate(formData.birthDate)}`;
+      url += `&phone=${formData.phone}`;
+      url += `&email=${formData.email}`;
       url += `&superintendence=${formData.superintendence}`;
       url += `&position=${formData.position}`;
       url += `&gender=${formData.gender}`;
@@ -193,6 +202,8 @@ const RegistrationForm = () => {
           setFormData({
             fullName: "",
             birthDate: "",
+            phone: "",
+            email: "",
             position: "",
             superintendence: "",
             gender: "",
@@ -219,6 +230,44 @@ const RegistrationForm = () => {
     hidden: { opacity: 0, x: -20 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
     exit: { opacity: 0, x: 20, transition: { duration: 0.3 } },
+  };
+
+  const handlePhone = (phone) => {
+    // Remover os caracteres não numéricos usando a expressão regular /\D/g e limitar a 11 dígitos.
+    var limparValor = phone.replace(/\D/g, "").substring(0, 11);
+
+    // Dividir a string em um array de caracteres individuais.
+    var numerosArray = limparValor.split("");
+
+    // Criar a variável para receber o número formatado
+    var numeroFormatado = "";
+
+    // Acessa o IF quando a quantidade de números é maior do que zero
+    if (numerosArray.length > 0) {
+      // Formatar o DD e concatenar o valor
+      // slice - extraie uma parte do array
+      // join - unir os elementos do array em uma única string
+      numeroFormatado += `(${numerosArray.slice(0, 2).join("")})`;
+    }
+
+    // Acessa o IF quando a quantidade de números é maior do que dois
+    if (numerosArray.length > 2) {
+      // Formatar o número do telefone e concatenar o valor
+      // slice - extraie uma parte do array
+      // join - unir os elementos do array em uma única string
+      numeroFormatado += ` ${numerosArray.slice(2, 7).join("")}`;
+    }
+
+    // Acessa o IF quando a quantidade de números é maior do que sete
+    if (numerosArray.length > 7) {
+      // Formatar o número do telefone e concatenar o valor
+      // slice - extraie uma parte do array
+      // join - unir os elementos do array em uma única string
+      numeroFormatado += `-${numerosArray.slice(7, 11).join("")}`;
+    }
+
+    // Enviar para o campo o número formatado
+    return numeroFormatado;
   };
 
   return (
@@ -263,6 +312,38 @@ const RegistrationForm = () => {
                   <p className="text-sm text-destructive">{errors.fullName}</p>
                 )}
               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Telefone</Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="text"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className={errors.phone ? "border-destructive" : ""}
+                  />
+                  {errors.phone && (
+                    <p className="text-sm text-destructive">{errors.phone}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={errors.email ? "border-destructive" : ""}
+                  />
+                  {errors.email && (
+                    <p className="text-sm text-destructive">{errors.email}</p>
+                  )}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="birthDate">Data de Nascimento</Label>
@@ -649,6 +730,13 @@ const RegistrationForm = () => {
                   <li>
                     <span className="font-medium">Nome:</span>{" "}
                     {formData.fullName}
+                  </li>
+                  <li>
+                    <span className="font-medium">telefone</span>{" "}
+                    {formData.phone}
+                  </li>
+                  <li>
+                    <span className="font-medium">e-mail</span> {formData.email}
                   </li>
                   <li>
                     <span className="font-medium">Data de Nascimento:</span>{" "}
